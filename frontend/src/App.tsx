@@ -9,8 +9,23 @@ import { MessageSquare, ArrowDown, ArrowUp } from 'lucide-react';
 function App() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [sortField, setSortField] = useState<'date' | 'id'>('date');
+  
+  // Initialize from localStorage or default
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(() => {
+    return (localStorage.getItem('sortOrder') as 'asc' | 'desc') || 'desc';
+  });
+  const [sortField, setSortField] = useState<'date' | 'id'>(() => {
+    return (localStorage.getItem('sortField') as 'date' | 'id') || 'date';
+  });
+
+  // Save to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('sortOrder', sortOrder);
+  }, [sortOrder]);
+
+  useEffect(() => {
+    localStorage.setItem('sortField', sortField);
+  }, [sortField]);
 
   const fetchComments = async () => {
     try {
