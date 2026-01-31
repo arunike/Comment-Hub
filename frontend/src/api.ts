@@ -3,8 +3,9 @@ import type { Comment } from './types';
 
 const API_URL = 'http://localhost:8000/api/comments/';
 
-export const getComments = async () => {
-    const response = await axios.get<Comment[]>(API_URL);
+export const getComments = async (sortField: 'date' | 'id' = 'date', sortOrder: 'asc' | 'desc') => {
+    const ordering = sortOrder === 'asc' ? sortField : `-${sortField}`;
+    const response = await axios.get<Comment[]>(`${API_URL}?ordering=${ordering}`);
     return response.data;
 };
 

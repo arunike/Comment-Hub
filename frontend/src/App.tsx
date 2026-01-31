@@ -4,15 +4,17 @@ import type { Comment } from './types';
 import { getComments, createComment, updateComment, deleteComment } from './api';
 import { CommentList } from './components/CommentList';
 import { CommentForm } from './components/CommentForm';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, ArrowDown, ArrowUp } from 'lucide-react';
 
 function App() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortField, setSortField] = useState<'date' | 'id'>('date');
 
   const fetchComments = async () => {
     try {
-      const data = await getComments();
+      const data = await getComments(sortField, sortOrder);
       setComments(data);
     } catch (error) {
       console.error("Failed to fetch comments", error);
@@ -23,7 +25,15 @@ function App() {
 
   useEffect(() => {
     fetchComments();
-  }, []);
+  }, [sortOrder, sortField]);
+
+  const toggleSort = () => {
+    setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+  }
+
+  const toggleSortField = () => {
+    setSortField(prev => prev === 'date' ? 'id' : 'date');
+  }
 
   const handleAddComment = async (text: string) => {
     try {
@@ -58,9 +68,47 @@ function App() {
 
   return (
     <div className="container">
-      <header style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <MessageSquare size={32} color="#2563eb" />
-        <h1 style={{ margin: 0 }}>Comment Hub</h1>
+      <header style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <MessageSquare size={32} color="#2563eb" />
+          <h1 style={{ margin: 0 }}>Comment Hub</h1>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button
+            onClick={toggleSortField}
+            style={{
+              padding: '0.5rem 1rem',
+              borderRadius: '0.5rem',
+              border: '1px solid #e2e8f0',
+              backgroundColor: 'white',
+              cursor: 'pointer',
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              color: '#64748b',
+            }}
+          >
+            Sort by: {sortField === 'date' ? 'Date' : 'ID'}
+          </button>
+          <button
+            onClick={toggleSort}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.5rem',
+              border: '1px solid #e2e8f0',
+              backgroundColor: 'white',
+              cursor: 'pointer',
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              color: '#64748b',
+            }}
+          >
+            {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
+            {sortOrder === 'asc' ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
+          </button>
+        </div>
       </header>
 
       <CommentForm onSubmit={handleAddComment} />
